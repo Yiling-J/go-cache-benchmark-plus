@@ -5,7 +5,6 @@ This benchmark compares throughput and hit ratios of different cache packages. T
 
 Feel free to create PR if you want to include your cache package, or open issue/discussion if you have question/requirement.
 
-Please ensure you have [Git LFS](https://git-lfs.github.com/) installed, before you clone this repository.
 
 ## throughput
 
@@ -32,6 +31,7 @@ hit ratio benchmarks use several widely adopted trace files:
 | SCARAB1H | https://github.com/ben-manes/caffeine/issues/106 |
 | META     | cachelib shared Meta [trace](https://cachelib.org/docs/Cache_Library_User_Guides/Cachebench_FB_HW_eval/#running-cachebench-with-the-trace-workload)                       |
 
+> The Meta trace file is too larger(> 1gb even gzipped), please download it from the link and put it in trace directory.
 
 you can run it with:
 

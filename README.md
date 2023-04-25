@@ -41,7 +41,7 @@ make bench-ratios
 
 You will see progress indicator(each dot represents 100k requests) when benchmark is running, result plots will be **generated automatically** in *results* directory after bench done.
 
-Bench results will be cached in *results* directory with name: "{client name}-{bench name}.data", this can make benchmark much faster when you are testing your package and run benchmark frequently. Just delete the file if you want to invalid cache.
+Bench results will be cached in *results* directory with name: `{client name}-{bench name}.data`, this can make benchmark much faster when you are testing your package and run benchmark frequently. Just delete the file if you want to invalid cache.
 
 ## throughput result
 ```

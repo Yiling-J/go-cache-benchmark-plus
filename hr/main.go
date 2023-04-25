@@ -5,6 +5,7 @@ import (
 	"compress/gzip"
 	"encoding/binary"
 	"encoding/csv"
+	"encoding/json"
 	"fmt"
 	"io"
 	"math/rand"
@@ -174,8 +175,8 @@ func bench(client clients.Client[string, string], cap int, gen func(keyChan chan
 }
 
 type result struct {
-	cap   int
-	ratio float64
+	Cap   int
+	Ratio float64
 }
 
 func newPlot(title string) *plot.Plot {
@@ -196,7 +197,7 @@ func newPlot(title string) *plot.Plot {
 func updatePlot(plot *plot.Plot, client clients.Client[string, string], results []result) {
 	data := plotter.XYs{}
 	for _, r := range results {
-		data = append(data, plotter.XY{X: float64(r.cap), Y: r.ratio})
+		data = append(data, plotter.XY{X: float64(r.Cap), Y: r.Ratio})
 	}
 	line, points, err := plotter.NewLinePoints(data)
 	if err != nil {
@@ -215,10 +216,28 @@ func benchAndPlot(title string, caps []int, gen func(keyChan chan key)) {
 	p := newPlot(title)
 
 	for _, client := range benchClients {
-		results := []result{}
-		for _, cap := range caps {
-			hr := bench(client, cap, gen)
-			results = append(results, result{cap: cap, ratio: hr})
+		var results []result
+		cacheFile := fmt.Sprintf("results/%s-%s.data", client.Name(), title)
+		cached, err := os.ReadFile(cacheFile)
+		if err == nil {
+			err = json.Unmarshal(cached, &results)
+			if err != nil {
+				panic(err)
+			}
+			fmt.Printf("cached result found: %s\n", cacheFile)
+		} else {
+			for _, cap := range caps {
+				hr := bench(client, cap, gen)
+				results = append(results, result{Cap: cap, Ratio: hr})
+			}
+			b, err := json.Marshal(results)
+			if err != nil {
+				panic(err)
+			}
+			err = os.WriteFile(cacheFile, b, 0644)
+			if err != nil {
+				panic(err)
+			}
 		}
 		updatePlot(p, client, results)
 	}

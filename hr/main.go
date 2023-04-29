@@ -113,7 +113,7 @@ func scarabGen(keyChan chan key) {
 }
 
 func fbGen(keyChan chan key) {
-	f, err := os.Open("trace/fb.trace.gz")
+	f, err := os.Open("trace/kvcache_traces_1.csv.gz")
 	if err != nil {
 		panic(err)
 	}

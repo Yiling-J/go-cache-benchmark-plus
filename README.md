@@ -49,12 +49,12 @@ goos: darwin
 goarch: amd64
 pkg: github.com/Yiling-J/go-cache-benchmark-plus
 cpu: Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz
-BenchmarkGetParallel/theine-12          29629987                36.80 ns/op            0 B/op          0 allocs/op
-BenchmarkGetParallel/ristretto-12       58325211                21.83 ns/op           17 B/op          1 allocs/op
-BenchmarkSetParallel/theine-12          19381866               107.4 ns/op             0 B/op          0 allocs/op
-BenchmarkSetParallel/ristretto-12       17546268                69.32 ns/op          116 B/op          3 allocs/op
-BenchmarkZipfParallel/theine-12         18559015                64.77 ns/op            0 B/op          0 allocs/op
-BenchmarkZipfParallel/ristretto-12      17261491                71.77 ns/op           99 B/op          3 allocs/op
+BenchmarkGetParallel/theine-12          27966540                38.26 ns/op            0 B/op          0 allocs/op
+BenchmarkGetParallel/ristretto-12       56940325                21.89 ns/op           17 B/op          1 allocs/op
+BenchmarkSetParallel/theine-12          15530439               105.1 ns/op             0 B/op          0 allocs/op
+BenchmarkSetParallel/ristretto-12       16919698                65.57 ns/op          115 B/op          3 allocs/op
+BenchmarkZipfParallel/theine-12         15119775                77.76 ns/op            0 B/op          0 allocs/op
+BenchmarkZipfParallel/ristretto-12      18971556                79.72 ns/op          100 B/op          3 allocs/op
 ```
 
 ## hit ratios result

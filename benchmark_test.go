@@ -19,19 +19,19 @@ func BenchmarkGetParallel(b *testing.B) {
 	for i := 0; i < 100000; i++ {
 		keys = append(keys, fmt.Sprintf("%d", i))
 	}
-	mask := len(keys) - 1
+	total := len(keys) - 1
 
 	for _, client := range benchClients {
-		client.Init(mask)
+		client.Init(total)
 		for _, key := range keys {
 			client.Set(key, key)
 		}
 		b.ResetTimer()
 		b.Run(client.Name(), func(b *testing.B) {
 			b.RunParallel(func(p *testing.PB) {
-				counter := int(rand.Int() & mask)
+				counter := rand.Int() % total
 				for p.Next() {
-					client.Get(keys[counter&mask])
+					client.Get(keys[counter%total])
 					counter++
 				}
 			})
@@ -45,10 +45,10 @@ func BenchmarkGetSingleParallel(b *testing.B) {
 	for i := 0; i < 100000; i++ {
 		keys = append(keys, fmt.Sprintf("%d", i))
 	}
-	mask := len(keys) - 1
+	total := len(keys) - 1
 
 	for _, client := range benchClients {
-		client.Init(mask)
+		client.Init(total)
 		for _, key := range keys {
 			client.Set(key, key)
 		}
@@ -69,15 +69,15 @@ func BenchmarkSetParallel(b *testing.B) {
 	for i := 0; i < 1000000; i++ {
 		keys = append(keys, fmt.Sprintf("%d", i))
 	}
-	mask := len(keys) - 1
+	total := len(keys) - 1
 	for _, client := range benchClients {
 		client.Init(100000)
 		b.ResetTimer()
 		b.Run(client.Name(), func(b *testing.B) {
 			b.RunParallel(func(p *testing.PB) {
-				counter := int(rand.Int() & mask)
+				counter := int(rand.Int() % total)
 				for p.Next() {
-					client.Set(keys[counter%mask], "bar")
+					client.Set(keys[counter%total], "bar")
 					counter++
 				}
 			})

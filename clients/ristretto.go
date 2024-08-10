@@ -20,9 +20,10 @@ func (c *Ristretto[K, V]) Style() *Style {
 
 func (c *Ristretto[K, V]) Init(cap int) {
 	client, err := ristretto.NewCache(&ristretto.Config{
-		NumCounters: int64(cap * 10),
-		MaxCost:     int64(cap),
-		BufferItems: 64,
+		NumCounters:        int64(cap * 10),
+		MaxCost:            int64(cap),
+		BufferItems:        64,
+		IgnoreInternalCost: true,
 	})
 	if err != nil {
 		panic(err)

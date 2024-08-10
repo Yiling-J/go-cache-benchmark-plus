@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"math/rand"
 	"testing"
-	"time"
 
 	"github.com/Yiling-J/go-cache-benchmark-plus/clients"
 )
@@ -12,6 +11,7 @@ import (
 var benchClients = []clients.Client[string, string]{
 	&clients.Theine[string, string]{},
 	&clients.Ristretto[string, string]{},
+	&clients.Otter[string, string]{},
 }
 
 func BenchmarkGetParallel(b *testing.B) {
@@ -19,15 +19,44 @@ func BenchmarkGetParallel(b *testing.B) {
 	for i := 0; i < 100000; i++ {
 		keys = append(keys, fmt.Sprintf("%d", i))
 	}
+	mask := len(keys) - 1
+
 	for _, client := range benchClients {
-		client.Init(100000)
+		client.Init(mask)
+		for _, key := range keys {
+			client.Set(key, key)
+		}
 		b.ResetTimer()
 		b.Run(client.Name(), func(b *testing.B) {
 			b.RunParallel(func(p *testing.PB) {
-				counter := 0
+				counter := int(rand.Int() & mask)
 				for p.Next() {
-					client.Get(keys[counter%100000])
+					client.Get(keys[counter&mask])
 					counter++
+				}
+			})
+		})
+		client.Close()
+	}
+}
+
+func BenchmarkGetSingleParallel(b *testing.B) {
+	keys := []string{}
+	for i := 0; i < 100000; i++ {
+		keys = append(keys, fmt.Sprintf("%d", i))
+	}
+	mask := len(keys) - 1
+
+	for _, client := range benchClients {
+		client.Init(mask)
+		for _, key := range keys {
+			client.Set(key, key)
+		}
+		b.ResetTimer()
+		b.Run(client.Name(), func(b *testing.B) {
+			b.RunParallel(func(p *testing.PB) {
+				for p.Next() {
+					client.Get(keys[0])
 				}
 			})
 		})
@@ -40,14 +69,15 @@ func BenchmarkSetParallel(b *testing.B) {
 	for i := 0; i < 1000000; i++ {
 		keys = append(keys, fmt.Sprintf("%d", i))
 	}
+	mask := len(keys) - 1
 	for _, client := range benchClients {
 		client.Init(100000)
 		b.ResetTimer()
 		b.Run(client.Name(), func(b *testing.B) {
 			b.RunParallel(func(p *testing.PB) {
-				counter := 0
+				counter := int(rand.Int() & mask)
 				for p.Next() {
-					client.Set(keys[counter%1000000], "bar")
+					client.Set(keys[counter%mask], "bar")
 					counter++
 				}
 			})
@@ -55,29 +85,4 @@ func BenchmarkSetParallel(b *testing.B) {
 		client.Close()
 	}
 
-}
-
-func BenchmarkZipfParallel(b *testing.B) {
-	z := rand.NewZipf(rand.New(rand.NewSource(time.Now().UnixNano())), 1.0001, 10, 1000000)
-	keys := []string{}
-	for i := 0; i < 1000000; i++ {
-		keys = append(keys, fmt.Sprintf("%d", z.Uint64()))
-	}
-	for _, client := range benchClients {
-		client.Init(100000)
-		b.ResetTimer()
-		b.Run(client.Name(), func(b *testing.B) {
-			b.RunParallel(func(p *testing.PB) {
-				counter := 0
-				for p.Next() {
-					_, ok := client.Get(keys[counter%1000000])
-					if !ok {
-						client.Set(keys[counter%1000000], "bar")
-					}
-					counter++
-				}
-			})
-		})
-		client.Close()
-	}
 }
